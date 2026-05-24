@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>פורת יוסף · מערכת ניהול</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@200;300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#060a14;
+  --s1:#0b1220;
+  --s2:#0f1828;
+  --s3:#141f32;
+  --card:#101829;
+  --card2:#161f30;
+  --b1:rgba(255,255,255,.06);
+  --b2:rgba(255,255,255,.11);
+  --b3:rgba(255,255,255,.18);
+  --t1:#d4dcea;
+  --t2:#6b7d99;
+  --t3:#384d68;
+  --gold:#c8a84a;
+  --gold2:#e8c46a;
+  --gold3:rgba(200,168,74,.15);
+  --silver:#8899bb;
+  --cyan:#2ec4be;
+  --red:#d94f4f;
+  --green:#2db87a;
+  --amber:#d4822a;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+}
+html{font-size:14px}
+body{font-family:'Heebo',sans-serif;background:var(--ink);color:var(--t1);min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 80% -100px,rgba(200,168,74,.05) 0%,transparent 70%),
+    radial-gradient(ellipse 600px 400px at -100px 90%,rgba(46,196,190,.04) 0%,transparent 70%);
+}
+
+/* ── Shell ── */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:56px;background:var(--s1);border-left:1px solid var(--b1);
+  display:flex;flex-direction:column;align-items:center;
+  position:fixed;top:0;right:0;bottom:0;z-index:50;padding:16px 0
+}
+.logo{margin-bottom:22px;text-align:center;padding:0 6px}
+.logo-name{
+  font-size:7.5px;font-weight:700;letter-spacing:.22em;color:var(--gold2);
+  text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);
+  opacity:.9
+}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;width:100%;padding:0 5px}
+.nav-sec{display:contents}
+.nav-lbl{display:none}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:9px 4px;border-radius:var(--r-sm);cursor:pointer;
+  transition:all .2s;user-select:none;width:100%
+}
+.nav-item:hover{background:rgba(255,255,255,.04)}
+.nav-item.active{background:rgba(200,168,74,.1);border:1px solid rgba(200,168,74,.18)}
+.nav-icon{font-size:14px;color:var(--t3);transition:color .2s;line-height:1}
+.nav-label{font-size:7.5px;font-weight:600;color:var(--t3);transition:color .2s;text-align:center;letter-spacing:.03em}
+.nav-item:hover .nav-icon,.nav-item:hover .nav-label{color:var(--t2)}
+.nav-item.active .nav-icon,.nav-item.active .nav-label{color:var(--gold2)}
+.sync-area{padding:8px 4px;text-align:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 3s infinite;margin:0 auto}
+@keyframes pulse{0%,100%{opacity:1}60%{opacity:.4}}
+
+/* ── Main ── */
+.main{margin-right:56px;flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{
+  background:rgba(6,10,20,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b1);padding:0 24px;height:46px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
+.topbar-sep{color:var(--t3);font-size:10px}
+.topbar-sub{font-size:10px;color:var(--t3)}
+.topbar-right{display:flex;gap:7px;align-items:center}
+.content{padding:16px 20px;flex:1}
+.page{display:none}.page.active{display:block}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r-sm);font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:all .2s;letter-spacing:.02em}
+.btn-gold{background:linear-gradient(135deg,#a8821e,var(--gold2));color:#080c18;font-weight:700;box-shadow:0 2px 12px rgba(200,168,74,.2)}
+.btn-gold:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 18px rgba(200,168,74,.32)}
+.btn-outline{background:transparent;color:var(--t2);border:1px solid var(--b2)}
+.btn-outline:hover{background:rgba(255,255,255,.04);color:var(--t1);border-color:var(--b3)}
+.btn-ghost{background:transparent;color:var(--t3);border:none;padding:5px 9px;font-size:11.5px}
+.btn-ghost:hover{color:var(--t2)}
+.btn-sm{padding:4px 11px;font-size:11px}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--t3);padding:4px 6px;border-radius:var(--r-sm);font-size:12px;transition:all .2s}
+.btn-icon:hover{background:rgba(255,255,255,.06);color:var(--t1)}
+
+/* ══════════════════════════════════════
+   KPI PANEL — compact row strips
+══════════════════════════════════════ */
+.kpi-panel{
+  background:var(--card);border:1px solid var(--b1);
+  border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden
+}
+.kpi-panel-hdr{
+  padding:8px 18px;border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;gap:8px
+}
+.kpi-panel-hdr-title{
+  font-size:8.5px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--t3)
+}
+.kpi-row{display:grid;border-bottom:1px solid var(--b1)}
+.kpi-row:last-child{border-bottom:none}
+.kpi-row.c4{grid-template-columns:repeat(4,1fr)}
+.kpi-row.c3{grid-template-columns:repeat(3,1fr)}
+.kpi-row.c5{grid-template-columns:repeat(5,1fr)}
+.kpi-row.c6{grid-template-columns:repeat(6,1fr)}
+
+.kpi-cell{
+  padding:12px 18px;border-left:1px solid var(--b1);
+  cursor:pointer;transition:background .15s;position:relative;
+  min-width:0;overflow:hidden
+}
+.kpi-cell:last-child{border-left:none}
+.kpi-cell:hover{background:rgba(255,255,255,.02)}
+.kc-lbl{
+  font-size:9px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--t3);
+  margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.kc-val{
+  font-size:20px;font-weight:300;line-height:1.1;
+  color:var(--t1);letter-spacing:-.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.kc-sub{font-size:9.5px;color:var(--t3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Accent line on right edge */
+.kpi-cell[data-accent]::after{
+  content:'';position:absolute;top:15%;bottom:15%;right:0;width:2px;border-radius:2px
+}
+.kpi-cell[data-accent="gold"]::after{background:var(--gold)}
+.kpi-cell[data-accent="green"]::after{background:var(--green)}
+.kpi-cell[data-accent="red"]::after{background:var(--red)}
+.kpi-cell[data-accent="cyan"]::after{background:var(--cyan)}
+.kpi-cell[data-accent="amber"]::after{background:var(--amber)}
+.kpi-cell[data-accent="silver"]::after{background:var(--silver)}
+
+/* Value colors — muted, premium */
+.v-gold{color:var(--gold2)!important}
+.v-green{color:var(--green)!important}
+.v-red{color:var(--red)!important}
+.v-cyan{color:var(--cyan)!important}
+.v-amber{color:var(--amber)!important}
+.v-silver{color:var(--silver)!important}
+.v-dim{color:var(--t2)!important}
+
+/* ── legacy .kpi for sub-pages ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--b1);border-radius:var(--r-lg);padding:13px 16px;cursor:pointer;transition:all .2s}
+.kpi:hover{transform:translateY(-2px);border-color:var(--b2)}
+.kpi-lbl{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.kpi-val{font-size:22px;font-weight:300;line-height:1;color:var(--t1);letter-spacing:-.02em}
+.kpi-sub{font-size:9.5px;color:var(--t3);margin-top:3px}
+.kpi.gold .kpi-val{color:var(--gold2)}
+.kpi.cyan .kpi-val{color:var(--cyan)}
+.kpi.red .kpi-val{color:var(--red)}
+.kpi.green .kpi-val{color:var(--green)}
+.kpi.orange .kpi-val{color:var(--amber)}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r-lg);overflow:hidden}
+.card-hdr{padding:11px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.card-body{padding:14px 18px}
+
+/* ── Table ── */
+.tbl-wrap{background:var(--card);border:1px solid var(--b1);border-radius:var(--r-lg);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead{background:var(--s3)}
+th{padding:9px 13px;font-weight:700;font-size:8.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);text-align:right;border-bottom:1px solid var(--b1);white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--t2)}
+td{padding:9px 13px;border-bottom:1px solid var(--b1);vertical-align:middle;color:var(--t1)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.018)}
+.td-bold{font-weight:500;font-size:12.5px}
+.td-muted{color:var(--t2);font-size:11.5px}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.b-gold{background:rgba(200,168,74,.12);color:var(--gold2);border:1px solid rgba(200,168,74,.22)}
+.b-cyan{background:rgba(46,196,190,.1);color:var(--cyan);border:1px solid rgba(46,196,190,.2)}
+.b-red{background:rgba(217,79,79,.1);color:var(--red);border:1px solid rgba(217,79,79,.2)}
+.b-green{background:rgba(45,184,122,.1);color:var(--green);border:1px solid rgba(45,184,122,.2)}
+.b-orange{background:rgba(212,130,42,.1);color:var(--amber);border:1px solid rgba(212,130,42,.2)}
+.b-gray{background:rgba(255,255,255,.05);color:var(--t2);border:1px solid var(--b2)}
+
+/* ── Filters ── */
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px;align-items:center}
+.fi{font-family:inherit;font-size:12px;color:var(--t1);background:var(--card);border:1px solid var(--b2);border-radius:var(--r-sm);padding:6px 11px;outline:none;transition:all .2s}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,74,.08)}
+.fi::placeholder{color:var(--t3)}
+.fi option{background:var(--s2)}
+.fi-search{flex:1;min-width:150px}
+
+/* ── Modal ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.overlay.open{display:flex}
+.modal{background:var(--s2);border-radius:var(--r-lg);border:1px solid var(--b2);box-shadow:0 40px 120px rgba(0,0,0,.8);width:min(580px,95vw);max-height:88vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal-hdr{padding:18px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s2);z-index:1}
+.modal-hdr h2{font-size:13.5px;font-weight:700;color:var(--t1)}
+.modal-body{padding:18px 24px;flex:1}
+.modal-ftr{padding:12px 24px;border-top:1px solid var(--b1);display:flex;gap:8px;justify-content:flex-end;background:var(--s2);position:sticky;bottom:0}
+.modal-ftr .spacer{flex:1}
+
+/* ── Form ── */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+.fg input,.fg select,.fg textarea{font-family:inherit;font-size:12.5px;color:var(--t1);background:rgba(255,255,255,.03);border:1px solid var(--b2);border-radius:var(--r-sm);padding:8px 12px;outline:none;transition:all .2s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,74,.08);background:rgba(255,255,255,.05)}
+.fg input::placeholder{color:var(--t3)}
+.fg select option{background:var(--s2)}
+.fg textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.span2{grid-column:1/-1}
+.form-sec{grid-column:1/-1;font-size:8.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);padding:12px 0 4px;border-bottom:1px solid rgba(200,168,74,.1);margin-bottom:4px}
+
+/* ── Drawer ── */
+.drawer-wrap{display:none;position:fixed;inset:0;z-index:150;pointer-events:none}
+.drawer-wrap.open{display:block;pointer-events:all}
+.drawer-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(5px)}
+.drawer{position:absolute;top:0;left:0;bottom:0;width:min(460px,95vw);background:var(--s2);border-right:1px solid var(--b2);box-shadow:-12px 0 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow-y:auto}
+.drawer-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--b1)}
+.drawer-sec{padding:14px 24px;border-bottom:1px solid var(--b1)}
+.drawer-sec-title{font-size:8.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.drow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:7px}
+.dkey{color:var(--t3);font-size:11px;min-width:70px;flex-shrink:0}
+.dval{color:var(--t1);font-size:12.5px}
+
+/* ── Debt accordion ── */
+.debt-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden}
+.debt-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;transition:background .15s}
+.debt-card-hdr:hover{background:rgba(255,255,255,.02)}
+.debt-card-hdr h3{font-size:13px;font-weight:500;color:var(--t1)}
+.debt-card-body{display:none;border-top:1px solid var(--b1)}
+.debt-card-body.open{display:block}
+
+/* ── Layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mt12{margin-top:12px}
+.note-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.note-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+
+/* ── Misc ── */
+.flex{display:flex}.gap8{gap:8px}.ac{align-items:center}.spacer{flex:1}
+.loading{text-align:center;padding:48px;color:var(--t3);font-size:12px}
+.xfer{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700}
+.xfer-yes{background:rgba(45,184,122,.12);color:var(--green);border:1px solid rgba(45,184,122,.25)}
+.xfer-no{background:rgba(217,79,79,.08);color:var(--red);border:1px solid rgba(217,79,79,.18)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:10px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.page.active{animation:fadeIn .2s ease}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="shell">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-eyebrow">מערכת ניהול</div>
+    <div class="logo-name">פורת יוסף</div>
+    <div class="logo-sub">PROPERTY COMMAND CENTER</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-sec">
+      <div class="nav-lbl">ראשי</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span><span class="nav-label">לוח בקרה</span></div>
+      <div class="nav-item" data-page="properties"><span class="nav-icon">⬡</span><span class="nav-label">נכסים</span></div>
+      <div class="nav-item" data-page="tenants"><span class="nav-icon">◉</span><span class="nav-label">שוכרים</span></div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">כספים</div>
+      <div class="nav-item" data-page="finance"><span class="nav-icon">◷</span><span class="nav-label">תשלומים</span></div>
+      <div class="nav-item" data-page="debts"><span class="nav-icon">◌</span><span class="nav-label">חובות</span></div>
+      <div class="nav-item" data-page="expenses"><span class="nav-icon">◧</span><span class="nav-label">הוצאות</span></div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">ניהול</div>
+      <div class="nav-item" data-page="tasks"><span class="nav-icon">◫</span><span class="nav-label">משימות</span></div>
+      <div class="nav-item" data-page="notes"><span class="nav-icon">◻</span><span class="nav-label">הערות</span></div>
+      <div class="nav-item" data-page="contracts"><span class="nav-icon">◱</span><span class="nav-label">חוזים</span></div>
+    </div>
+  </nav>
+  <div class="sync-area">
+    <div class="sync-pill">
+      <div class="dot"></div>
+      <span id="sync-label">מחובר לענן</span>
+    </div>
+    <div style="font-size:9.5px;color:var(--text3);margin-top:4px" id="last-sync">טוען...</div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-title" id="topbar-title">לוח בקרה</span>
+    <span class="topbar-sep">·</span>
+    <span class="topbar-sub" id="topbar-date"></span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="syncAll()">↻ רענן</button>
+    <button class="btn btn-outline btn-sm" onclick="openAddProp()">+ נכס חדש</button>
+    <button class="btn btn-gold btn-sm" onclick="openAddPayment()">+ תשלום</button>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active content" id="page-dashboard">
+  <div id="kpi-grid"><div class="loading">מאתחל...</div></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">⚠ חוזים — דורשים תשומת לב</span></div>
+      <table><tbody id="dash-expiring"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">⚡ משימות דחופות</span></div>
+      <table><tbody id="dash-tasks"></tbody></table>
+    </div>
+  </div>
+  <div class="two-col mt14">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">₪ סיכום חודש שעבר</span></div>
+      <div class="card-body" id="dash-finance"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">◈ פילוח תיק הנכסים</span></div>
+      <div class="card-body" id="dash-breakdown"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROPERTIES ══ -->
+<div class="page content" id="page-properties">
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש נכס..." id="fp-search" oninput="renderProperties()">
+    <select class="fi" id="fp-own" onchange="renderProperties()"><option value="">כל הבעלות</option><option>הקדש</option><option>עמותה</option><option>פרטי</option></select>
+    <select class="fi" id="fp-ten" onchange="renderProperties()"><option value="">כל השכירות</option><option>שכירות</option><option>דמי מפתח</option></select>
+    <select class="fi" id="fp-sta" onchange="renderProperties()"><option value="">כל הסטטוסים</option><option>פעיל</option><option>ריק</option><option>הליך משפטי</option><option>בעיה</option></select>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>כתובת</th><th>בעלות</th><th>שכירות</th><th>שכ"ד ₪</th><th>סטטוס</th><th>שוכר פעיל</th><th>חוזה עד</th><th></th></tr></thead>
+    <tbody id="prop-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ TENANTS ══ -->
+<div class="page content" id="page-tenants">
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש שוכר..." id="ft-search" oninput="renderTenants()">
+    <select class="fi" id="ft-sta" onchange="renderTenants()"><option value="">כל הסטטוסים</option><option>פעיל</option><option>לשעבר</option></select>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>שם</th><th>נכס</th><th>טלפון</th><th>חוזה מ-</th><th>חוזה עד</th><th>שכ"ד</th><th>סטטוס</th><th>⚡</th><th>💧</th><th>🏛</th><th></th></tr></thead>
+    <tbody id="ten-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ FINANCE ══ -->
+<div class="page content" id="page-finance">
+  <div class="kpi-grid" id="fin-kpis"></div>
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש..." id="ff-search" oninput="renderFinance()">
+    <select class="fi" id="ff-sta" onchange="renderFinance()"><option value="">כל הסטטוסים</option><option>שולם</option><option>חלקי</option><option>חוב</option></select>
+    <select class="fi" id="ff-addr" onchange="renderFinance()"><option value="">כל הנכסים</option></select>
+    <button class="btn btn-gold btn-sm" onclick="openAddPayment()">+ תשלום</button>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>נכס</th><th>שוכר</th><th>חודש</th><th>לתשלום</th><th>שולם</th><th>יתרה</th><th>סטטוס</th><th>תאריך</th><th>אמצעי</th><th></th></tr></thead>
+    <tbody id="fin-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ DEBTS ══ -->
+<div class="page content" id="page-debts">
+  <div class="kpi-grid" id="debt-kpis"></div>
+  <div id="debt-sections" class="mt14"></div>
+</div>
+
+<!-- ══ EXPENSES ══ -->
+<div class="page content" id="page-expenses">
+  <div class="kpi-grid" id="exp-kpis"></div>
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש..." id="fe-search" oninput="renderExpenses()">
+    <select class="fi" id="fe-sta" onchange="renderExpenses()"><option value="">כל הסטטוסים</option><option>ממתין</option><option>שולם</option></select>
+    <select class="fi" id="fe-cat" onchange="renderExpenses()"><option value="">כל הקטגוריות</option><option>תיקון</option><option>תחזוקה</option><option>משפטי</option><option>ועד בית</option><option>ביטוח</option><option>אחר</option></select>
+    <button class="btn btn-gold btn-sm" onclick="openAddExpense()">+ הוצאה</button>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>נכס</th><th>תאריך</th><th>קטגוריה</th><th>תיאור</th><th>סכום</th><th>סטטוס</th><th>ספק</th><th></th></tr></thead>
+    <tbody id="exp-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ TASKS ══ -->
+<div class="page content" id="page-tasks">
+  <div class="kpi-grid" id="task-kpis"></div>
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש משימה..." id="ftk-search" oninput="renderTasks()">
+    <select class="fi" id="ftk-pri" onchange="renderTasks()"><option value="">כל העדיפויות</option><option>דחוף</option><option>ממתין להחלטה</option><option>שוטף</option></select>
+    <select class="fi" id="ftk-sta" onchange="renderTasks()"><option value="">כל הסטטוסים</option><option>פתוח</option><option>בטיפול</option><option>סגור</option></select>
+    <button class="btn btn-gold btn-sm" onclick="openAddTask()">+ משימה</button>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>כותרת</th><th>נכס</th><th>עדיפות</th><th>סטטוס</th><th>תאריך יעד</th><th>אחראי</th><th></th></tr></thead>
+    <tbody id="task-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ NOTES ══ -->
+<div class="page content" id="page-notes">
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש בהערות..." id="fn-search" oninput="renderNotes()">
+    <select class="fi" id="fn-addr" onchange="renderNotes()"><option value="">כל הנכסים</option></select>
+    <button class="btn btn-gold btn-sm" onclick="openAddNote()">+ הערה</button>
+  </div>
+  <div id="notes-list" class="mt14"></div>
+</div>
+
+<!-- ══ CONTRACTS ══ -->
+<div class="page content" id="page-contracts">
+  <div class="filters">
+    <input class="fi fi-search" type="text" placeholder="חיפוש..." id="fc-search" oninput="renderContracts()">
+    <select class="fi" id="fc-sta" onchange="renderContracts()"><option value="">כל הסטטוסים</option><option value="פג">פג תוקף</option><option value="קרוב">פג בקרוב</option><option value="תקף">בתוקף</option><option value="dmf">דמ"פ</option></select>
+    <button class="btn btn-outline btn-sm" onclick="window.print()">🖨 הדפס דוח</button>
+  </div>
+  <div class="tbl-wrap mt14">
+    <table><thead><tr><th>כתובת</th><th>שוכר</th><th>סוג</th><th>בעלות</th><th>פקיעה</th><th>סטטוס</th><th>שכ"ד</th><th></th></tr></thead>
+    <tbody id="contracts-tbody"></tbody></table>
+  </div>
+</div>
+</main>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- Property -->
+<div class="overlay" id="prop-modal" onclick="if(event.target===this)closePropModal()">
+<div class="modal">
+  <div class="modal-hdr"><h2 id="pm-title">נכס חדש</h2><button class="btn-icon" onclick="closePropModal()">✕</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="form-sec">פרטי נכס</div>
+    <div class="fg span2"><label>כתובת</label><input id="pm-address" type="text"></div>
+    <div class="fg"><label>עיר</label><input id="pm-city" value="ירושלים"></div>
+    <div class="fg"><label>בעלות</label><select id="pm-own"><option>הקדש</option><option>עמותה</option><option>פרטי</option></select></div>
+    <div class="fg"><label>סוג שכירות</label><select id="pm-ten"><option>שכירות</option><option>דמי מפתח</option><option>אחר</option></select></div>
+    <div class="fg"><label>סטטוס</label><select id="pm-sta"><option>פעיל</option><option>ריק</option><option>הליך משפטי</option><option>בעיה</option></select></div>
+    <div class="fg"><label>שכ"ד חודשי ₪</label><input id="pm-rent" type="number"></div>
+    <div class="fg"><label>חדרים</label><input id="pm-rooms"></div>
+    <div class="fg"><label>שטח מ"ר</label><input id="pm-area"></div>
+    <div class="form-sec">טאבו ורשויות</div>
+    <div class="fg"><label>גוש</label><input id="pm-block"></div>
+    <div class="fg"><label>חלקה</label><input id="pm-parcel"></div>
+    <div class="fg"><label>חשבון ארנונה</label><input id="pm-arnona"></div>
+    <div class="fg"><label>חשבון מים</label><input id="pm-water"></div>
+    <div class="fg"><label>חשבון חשמל</label><input id="pm-elec"></div>
+    <div class="fg"><label>מונה מים</label><input id="pm-wmeter"></div>
+    <div class="fg span2"><label>קישור נסח טאבו</label><input id="pm-tabu"></div>
+    <div class="form-sec">הערות</div>
+    <div class="fg span2"><label>הערות על הנכס</label><textarea id="pm-notes" rows="3"></textarea></div>
+  </div></div>
+  <div class="modal-ftr">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="pm-del" onclick="delProp()">מחק נכס</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="closePropModal()">ביטול</button>
+    <button class="btn btn-gold" onclick="saveProp()">שמור</button>
+  </div>
+</div></div>
+
+<!-- Payment -->
+<div class="overlay" id="pay-modal" onclick="if(event.target===this)closePayModal()">
+<div class="modal">
+  <div class="modal-hdr"><h2 id="pay-title">תשלום חדש</h2><button class="btn-icon" onclick="closePayModal()">✕</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="fg"><label>נכס</label><select id="pay-addr"></select></div>
+    <div class="fg"><label>שוכר</label><select id="pay-tenant"></select></div>
+    <div class="fg"><label>חודש חיוב</label><input id="pay-period" placeholder="MM/YYYY"></div>
+    <div class="fg"><label>תאריך תשלום</label><input id="pay-date" placeholder="DD/MM/YYYY"></div>
+    <div class="fg"><label>סכום לתשלום ₪</label><input id="pay-expected" type="number"></div>
+    <div class="fg"><label>סכום ששולם ₪</label><input id="pay-paid" type="number"></div>
+    <div class="fg"><label>אמצעי תשלום</label><select id="pay-method"><option>העברה בנקאית</option><option>מזומן</option><option>צ'ק</option><option>הוראת קבע</option></select></div>
+    <div class="fg"><label>סטטוס</label><select id="pay-sta"><option>שולם</option><option>חלקי</option><option>חוב</option></select></div>
+    <div class="fg span2"><label>אסמכתא</label><input id="pay-ref"></div>
+    <div class="fg span2"><label>הערות</label><textarea id="pay-notes" rows="2"></textarea></div>
+  </div></div>
+  <div class="modal-ftr">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="pay-del" onclick="delPayment()">מחק</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="closePayModal()">ביטול</button>
+    <button class="btn btn-gold" onclick="savePayment()">שמור</button>
+  </div>
+</div></div>
+
+<!-- Expense -->
+<div class="overlay" id="exp-modal" onclick="if(event.target===this)closeExpModal()">
+<div class="modal">
+  <div class="modal-hdr"><h2 id="exp-title">הוצאה חדשה</h2><button class="btn-icon" onclick="closeExpModal()">✕</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="fg"><label>נכס</label><select id="em-addr"></select></div>
+    <div class="fg"><label>תאריך</label><input id="em-date"></div>
+    <div class="fg"><label>קטגוריה</label><select id="em-cat"><option>תיקון</option><option>תחזוקה</option><option>משפטי</option><option>ועד בית</option><option>ביטוח</option><option>אחר</option></select></div>
+    <div class="fg"><label>סכום ₪</label><input id="em-amount" type="number"></div>
+    <div class="fg span2"><label>תיאור</label><input id="em-desc"></div>
+    <div class="fg"><label>סטטוס</label><select id="em-sta"><option>ממתין</option><option>שולם</option></select></div>
+    <div class="fg"><label>ספק/קבלן</label><input id="em-supplier"></div>
+    <div class="fg span2"><label>הערות</label><textarea id="em-notes" rows="2"></textarea></div>
+  </div></div>
+  <div class="modal-ftr">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="em-del" onclick="delExpense()">מחק</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="closeExpModal()">ביטול</button>
+    <button class="btn btn-gold" onclick="saveExpense()">שמור</button>
+  </div>
+</div></div>
+
+<!-- Task -->
+<div class="overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
+<div class="modal">
+  <div class="modal-hdr"><h2 id="task-title">משימה חדשה</h2><button class="btn-icon" onclick="closeTaskModal()">✕</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="fg span2"><label>כותרת</label><input id="tm-title"></div>
+    <div class="fg"><label>נכס</label><select id="tm-addr"></select></div>
+    <div class="fg"><label>עדיפות</label><select id="tm-pri"><option>דחוף</option><option>ממתין להחלטה</option><option>שוטף</option></select></div>
+    <div class="fg"><label>סטטוס</label><select id="tm-sta"><option>פתוח</option><option>בטיפול</option><option>סגור</option></select></div>
+    <div class="fg"><label>תאריך יעד</label><input id="tm-due" placeholder="DD/MM/YYYY"></div>
+    <div class="fg span2"><label>אחראי</label><input id="tm-assigned"></div>
+    <div class="fg span2"><label>תיאור מלא</label><textarea id="tm-desc" rows="4"></textarea></div>
+  </div></div>
+  <div class="modal-ftr">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="tm-del" onclick="delTask()">מחק</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="closeTaskModal()">ביטול</button>
+    <button class="btn btn-gold" onclick="saveTask()">שמור</button>
+  </div>
+</div></div>
+
+<!-- Note -->
+<div class="overlay" id="note-modal" onclick="if(event.target===this)closeNoteModal()">
+<div class="modal">
+  <div class="modal-hdr"><h2 id="note-modal-title">הערה חדשה</h2><button class="btn-icon" onclick="closeNoteModal()">✕</button></div>
+  <div class="modal-body"><div class="form-grid">
+    <div class="fg"><label>נכס</label><select id="nm-addr"><option value="">כללי</option></select></div>
+    <div class="fg"><label>תאריך</label><input id="nm-date"></div>
+    <div class="fg"><label>כותב</label><input id="nm-author"></div>
+    <div class="fg"><label>סוג</label><select id="nm-type"><option>נכס</option><option>שוכר</option><option>משימה</option><option>הוצאה</option><option>כללי</option></select></div>
+    <div class="fg span2"><label>כותרת</label><input id="nm-title"></div>
+    <div class="fg span2"><label>תוכן — ניתן לכתוב מסמך שלם</label><textarea id="nm-content" rows="9" style="min-height:180px"></textarea></div>
+  </div></div>
+  <div class="modal-ftr">
+    <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="nm-del" onclick="delNote()">מחק</button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" onclick="closeNoteModal()">ביטול</button>
+    <button class="btn btn-gold" onclick="saveNote()">שמור</button>
+  </div>
+</div></div>
+
+<!-- Detail Drawer -->
+<div class="drawer-wrap" id="drawer">
+  <div class="drawer-backdrop" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer-content"></div>
+</div>
+
+<script>
+// ─── Config ─────────────────────────────────────────────────────────────────
+const SHEET_ID='1h9rJ9X0UsDh4TkUOCXMAbbmCBrpNGlO38ZQ0s9KjEyk';
+const BASE=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=`;
+const TODAY=new Date();TODAY.setHours(0,0,0,0);
+
+// ─── Topbar date ─────────────────────────────────────────────────────────────
+const days=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const months=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+document.getElementById('topbar-date').textContent=`יום ${days[TODAY.getDay()]}, ${TODAY.getDate()} ${months[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
+
+// ─── LocalStorage ────────────────────────────────────────────────────────────
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
+function lss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+let DB={
+  props:ls('fy2_props',[]),tenants:ls('fy2_tenants',[]),
+  payments:ls('fy2_payments',[]),expenses:ls('fy2_expenses',[]),
+  tasks:ls('fy2_tasks',[]),notes:ls('fy2_notes',[]),
+};
+function persist(){Object.keys(DB).forEach(k=>lss('fy2_'+k,DB[k]))}
+
+// ─── Sheets fetch ────────────────────────────────────────────────────────────
+async function fetchSheet(name){
+  try{
+    const r=await fetch(BASE+encodeURIComponent(name));
+    const txt=await r.text();
+    const json=JSON.parse(txt.replace(/^[^{]+/,'').replace(/[^}]+$/,''));
+    const cols=json.table.cols.map(c=>c.label);
+    return(json.table.rows||[]).map(row=>{
+      const o={};cols.forEach((c,i)=>{const cell=row.c&&row.c[i];o[c]=cell?(cell.v!==null&&cell.v!==undefined?String(cell.v):''):'';});return o;
+    }).filter(r=>Object.values(r).some(v=>v));
+  }catch{return null}
+}
+
+function pick(obj,...keys){for(const k of keys){if(obj[k]!==undefined&&obj[k]!=='')return obj[k]}return''}
+
+async function syncAll(){
+  document.getElementById('sync-label').textContent='מסנכרן...';
+  const[props,tenants,payments,expenses,tasks,notes]=await Promise.all([
+    fetchSheet('נכסים'),fetchSheet('שוכרים'),fetchSheet('תשלומים'),
+    fetchSheet('הוצאות'),fetchSheet('משימות'),fetchSheet('הערות'),
+  ]);
+
+  if(props&&props.length){
+    DB.props=props.map((r,i)=>({
+      id:pick(r,'מזהה נכס (property_id)','מזהה נכס')||'PROP-'+String(i+1).padStart(3,'0'),
+      address:pick(r,'כתובת (address)','כתובת')||'',
+      city:pick(r,'עיר (city)','עיר')||'',
+      ownership:pick(r,'סוג בעלות (ownership_type)','סוג בעלות')||'',
+      tenure:pick(r,'סוג שכירות (tenure_type)','סוג שכירות')||'',
+      status:pick(r,'סטטוס נכס (status)','סטטוס נכס')||'',
+      rent:pick(r,'שכ"ד חודשי (₪) (monthly_rent)','שכ"ד חודשי (₪)')||'0',
+      rooms:pick(r,'חדרים (rooms)','חדרים')||'',
+      area:pick(r,'שטח (מ"ר) (floor_area_sqm)','שטח (מ"ר)')||'',
+      block:pick(r,'גוש (block)','גוש')||'',
+      parcel:pick(r,'חלקה (parcel)','חלקה')||'',
+      arnona:pick(r,'חשבון ארנונה (arnona_account)','חשבון ארנונה')||'',
+      water:pick(r,'חשבון מים (water_account)','חשבון מים')||'',
+      elec:pick(r,'חשבון חשמל (electricity_account)','חשבון חשמל')||'',
+      wmeter:pick(r,'מונה מים (water_meter)','מונה מים')||'',
+      tabu:pick(r,'קישור נסח טאבו (tabu_link)','קישור נסח טאבו')||'',
+      notes:pick(r,'הערות על הנכס (property_notes)','הערות על הנכס')||'',
+    })).filter(p=>p.address);
+    lss('fy2_props',DB.props);
+  }
+  if(tenants&&tenants.length){
+    DB.tenants=tenants.map((r,i)=>({
+      id:pick(r,'מזהה שוכר (tenant_id)','מזהה שוכר')||'TEN-'+String(i+1).padStart(3,'0'),
+      propId:pick(r,'מזהה נכס (property_id)','מזהה נכס')||'',
+      name:((pick(r,'שם פרטי (first_name)','שם פרטי')||'')+' '+(pick(r,'שם משפחה (last_name)','שם משפחה')||'')).trim(),
+      phone1:pick(r,'טלפון 1 (phone1)','טלפון 1')||'',
+      phone2:pick(r,'טלפון 2 (phone2)','טלפון 2')||'',
+      start:pick(r,'תחילת חוזה (contract_start)','תחילת חוזה')||'',
+      end:pick(r,'סיום חוזה (contract_end)','סיום חוזה')||'',
+      rent:pick(r,'שכ"ד חודשי ₪ (monthly_rent)','שכ"ד חודשי ₪')||'0',
+      status:pick(r,'סטטוס (status)','סטטוס')||'',
+      elec:pick(r,'חשמל הועבר (electricity_transferred)','חשמל הועבר')||'',
+      water:pick(r,'מים הועבר (water_transferred)','מים הועבר')||'',
+      arnona:pick(r,'ארנונה הועברה (arnona_transferred)','ארנונה הועברה')||'',
+    })).filter(t=>t.name.trim());
+    lss('fy2_tenants',DB.tenants);
+  }
+  if(payments&&payments.length){
+    DB.payments=payments.map((r,i)=>({
+      id:pick(r,'מזהה תשלום (payment_id)','מזהה תשלום')||'PAY-'+String(i+1).padStart(3,'0'),
+      propId:pick(r,'מזהה נכס (property_id)','מזהה נכס')||'',
+      tenantId:pick(r,'מזהה שוכר (tenant_id)','מזהה שוכר')||'',
+      date:pick(r,'תאריך תשלום (payment_date)','תאריך תשלום')||'',
+      period:pick(r,'חודש חיוב (period_month)','חודש חיוב')||'',
+      expected:pick(r,'סכום לתשלום ₪ (amount_expected)','סכום לתשלום ₪')||'0',
+      paid:pick(r,'סכום ששולם ₪ (amount_paid)','סכום ששולם ₪')||'0',
+      status:pick(r,'סטטוס (status)','סטטוס')||'',
+      method:pick(r,'אמצעי תשלום (payment_method)','אמצעי תשלום')||'',
+      ref:pick(r,'אסמכתא (reference)','אסמכתא')||'',
+      notes:pick(r,'הערות (notes)','הערות')||'',
+    })).filter(p=>p.propId);
+    lss('fy2_payments',DB.payments);
+  }
+  if(expenses&&expenses.length){
+    DB.expenses=expenses.map((r,i)=>({
+      id:pick(r,'מזהה הוצאה (expense_id)','מזהה הוצאה')||'EXP-'+String(i+1).padStart(3,'0'),
+      propId:pick(r,'מזהה נכס (property_id)','מזהה נכס')||'',
+      date:pick(r,'תאריך (date)','תאריך')||'',
+      category:pick(r,'קטגוריה (category)','קטגוריה')||'',
+      desc:pick(r,'תיאור (description)','תיאור')||'',
+      amount:pick(r,'סכום ₪ (amount)','סכום ₪')||'0',
+      status:pick(r,'סטטוס (status)','סטטוס')||'',
+      supplier:pick(r,'ספק/קבלן (supplier)','ספק/קבלן')||'',
+      notes:pick(r,'הערות (notes)','הערות')||'',
+    })).filter(e=>e.propId);
+    lss('fy2_expenses',DB.expenses);
+  }
+  if(tasks&&tasks.length){
+    DB.tasks=tasks.map((r,i)=>({
+      id:pick(r,'מזהה משימה (task_id)','מזהה משימה')||'TSK-'+String(i+1).padStart(3,'0'),
+      propId:pick(r,'מזהה נכס (property_id)','מזהה נכס')||'',
+      title:pick(r,'כותרת (title)','כותרת')||'',
+      desc:pick(r,'תיאור מלא (description)','תיאור מלא')||'',
+      priority:pick(r,'עדיפות (priority)','עדיפות')||'',
+      status:pick(r,'סטטוס (status)','סטטוס')||'',
+      due:pick(r,'תאריך יעד (due_date)','תאריך יעד')||'',
+      assigned:pick(r,'אחראי (assigned_to)','אחראי')||'',
+    })).filter(t=>t.title);
+    lss('fy2_tasks',DB.tasks);
+  }
+  if(notes&&notes.length){
+    DB.notes=notes.map((r,i)=>({
+      id:pick(r,'מזהה הערה (note_id)','מזהה הערה')||'NOTE-'+String(i+1).padStart(3,'0'),
+      type:pick(r,'סוג ישות (entity_type)','סוג ישות')||'',
+      entityId:pick(r,'מזהה ישות (entity_id)','מזהה ישות')||'',
+      date:pick(r,'תאריך ושעה (created_at)','תאריך ושעה')||'',
+      author:pick(r,'שם הכותב (author)','שם הכותב')||'',
+      title:pick(r,'כותרת (title)','כותרת')||'',
+      content:pick(r,'תוכן ההערה (content)','תוכן ההערה')||'',
+    })).filter(n=>n.content||n.title);
+    lss('fy2_notes',DB.notes);
+  }
+  const now=new Date();
+  document.getElementById('sync-label').textContent='מחובר לענן';
+  document.getElementById('last-sync').textContent=`עודכן ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  renderCurrent();
+}
+
+// ─── Utils ───────────────────────────────────────────────────────────────────
+function parseDate(s){if(!s)return null;const m=String(s).match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);if(!m)return null;let y=parseInt(m[3]);if(y<100)y+=2000;const d=new Date(y,parseInt(m[2])-1,parseInt(m[1]));return isNaN(d)?null:d}
+function cSt(end,tenure){if(tenure==='דמי מפתח')return'dmf';const d=parseDate(end);if(!d)return'unknown';const diff=(d-TODAY)/86400000;if(diff<0)return'פג';if(diff<=90)return'קרוב';return'תקף'}
+function fmt(n){return'₪'+(Number(n||0)).toLocaleString('he-IL')}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function todayStr(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`}
+function propAddr(id){return DB.props.find(x=>x.id===id)?.address||id}
+function allAddresses(){return[...new Set(DB.props.map(p=>p.address).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'he'))}
+function prevMonthRange(){const now=new Date();const y=now.getMonth()===0?now.getFullYear()-1:now.getFullYear();const m=now.getMonth()===0?11:now.getMonth()-1;return{start:new Date(y,m,1),end:new Date(y,m+1,0)}}
+
+function badge(st){
+  const m={'פג':['b-red','פג תוקף'],'קרוב':['b-orange','פג בקרוב'],'תקף':['b-green','בתוקף'],'dmf':['b-cyan','דמ"פ'],'unknown':['b-gray','—'],
+    'פעיל':['b-green','פעיל'],'ריק':['b-gray','ריק'],'הליך משפטי':['b-red','הליך משפטי'],'בעיה':['b-orange','בעיה'],
+    'שולם':['b-green','שולם'],'חלקי':['b-orange','חלקי'],'חוב':['b-red','חוב'],
+    'ממתין':['b-orange','ממתין'],'דחוף':['b-red','דחוף'],'ממתין להחלטה':['b-orange','ממתין להחלטה'],'שוטף':['b-cyan','שוטף'],
+    'פתוח':['b-orange','פתוח'],'בטיפול':['b-cyan','בטיפול'],'סגור':['b-green','סגור'],
+    'הקדש':['b-gold','הקדש'],'עמותה':['b-cyan','עמותה'],'פרטי':['b-gray','פרטי'],
+    'שכירות':['b-green','שכירות'],'דמי מפתח':['b-cyan','דמ"פ'],
+    'תיקון':['b-red','תיקון'],'תחזוקה':['b-orange','תחזוקה'],'משפטי':['b-red','משפטי'],
+    'ועד בית':['b-gray','ועד בית'],'ביטוח':['b-cyan','ביטוח'],'אחר':['b-gray','אחר'],
+  };
+  const[cls,lbl]=m[st]||['b-gray',st||'—'];
+  return`<span class="badge ${cls}">${lbl}</span>`;
+}
+function xfer(v){const yes=v==='כן'||v==='TRUE'||v==='true';return`<span class="xfer ${yes?'xfer-yes':'xfer-no'}">${yes?'✓':'✗'}</span>`}
+
+function populateAddr(){
+  const addrs=allAddresses();
+  const opts=addrs.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  ['ff-addr','fn-addr'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=el.value;el.innerHTML=`<option value="">כל הנכסים</option>`+opts;el.value=cur});
+  ['pay-addr','em-addr','tm-addr'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=opts});
+  const na=document.getElementById('nm-addr');if(na)na.innerHTML=`<option value="">כללי</option>`+opts;
+}
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+const TITLES={dashboard:'לוח בקרה',properties:'נכסים',tenants:'שוכרים',finance:'תשלומים',debts:'חובות',expenses:'הוצאות',tasks:'משימות',notes:'הערות',contracts:'חוזים'};
+let curPage='dashboard';
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const pg=el.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-'+pg).classList.add('active');
+    document.getElementById('topbar-title').textContent=TITLES[pg];
+    curPage=pg;renderCurrent();
+  });
+});
+function renderCurrent(){
+  populateAddr();
+  ({dashboard:renderDashboard,properties:renderProperties,tenants:renderTenants,
+    finance:renderFinance,debts:renderDebts,expenses:renderExpenses,
+    tasks:renderTasks,notes:renderNotes,contracts:renderContracts})[curPage]?.();
+}
+function goPage(pg){document.querySelectorAll('.nav-item').forEach(n=>{if(n.dataset.page===pg)n.click()})}
+
+// ─── Dashboard ───────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const{start,end}=prevMonthRange();
+  let inc=0,exp=0;
+  DB.payments.forEach(p=>{const d=parseDate(p.date);if(d&&d>=start&&d<=end)inc+=Number(p.paid||0)});
+  DB.expenses.forEach(e=>{const d=parseDate(e.date);if(d&&d>=start&&d<=end)exp+=Number(e.amount||0)});
+  const debt=DB.payments.filter(p=>p.status==='חוב').reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0);
+  const pending=DB.expenses.filter(e=>e.status==='ממתין').reduce((s,e)=>s+Number(e.amount||0),0);
+  const urgent=DB.tasks.filter(t=>t.priority==='דחוף'&&t.status!=='סגור').length;
+  const decision=DB.tasks.filter(t=>t.priority==='ממתין להחלטה'&&t.status!=='סגור').length;
+  const active=DB.props.filter(p=>p.status==='פעיל').length;
+  const legal=DB.props.filter(p=>p.status==='הליך משפטי').length;
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi-panel">
+      <div class="kpi-panel-hdr">
+        <span class="kpi-panel-hdr-title">כספים — חודש שעבר</span>
+        <span style="font-size:9px;color:var(--t3);margin-right:auto;margin-left:0;padding-right:8px">${new Date().toLocaleDateString('he-IL',{month:'long',year:'numeric'})}</span>
+      </div>
+      <div class="kpi-row c4">
+        <div class="kpi-cell" data-accent="green" onclick="goPage('finance')">
+          <div class="kc-lbl">הכנסות שכר דירה</div>
+          <div class="kc-val v-green">${fmt(inc)}</div>
+          <div class="kc-sub">חודש שעבר</div>
+        </div>
+        <div class="kpi-cell" data-accent="red" onclick="goPage('finance')">
+          <div class="kc-lbl">הוצאות</div>
+          <div class="kc-val v-red">${fmt(exp)}</div>
+          <div class="kc-sub">חודש שעבר</div>
+        </div>
+        <div class="kpi-cell" data-accent="${inc-exp>=0?'cyan':'red'}" onclick="goPage('finance')">
+          <div class="kc-lbl">יתרה נטו</div>
+          <div class="kc-val ${inc-exp>=0?'v-cyan':'v-red'}">${fmt(inc-exp)}</div>
+          <div class="kc-sub" style="color:${inc-exp>=0?'var(--green)':'var(--red)'}">${inc-exp>=0?'↑ חיובי':'↓ גירעון'}</div>
+        </div>
+        <div class="kpi-cell" data-accent="amber" onclick="goPage('finance')">
+          <div class="kc-lbl">העלאות שכ"ד — השנה</div>
+          <div class="kc-val v-amber">${fmt(0)}</div>
+          <div class="kc-sub">סכום חודשי מצטבר</div>
+        </div>
+      </div>
+      <div class="kpi-row c3">
+        <div class="kpi-cell" data-accent="red" onclick="goPage('debts')">
+          <div class="kc-lbl">חובות שכ"ד — סה"כ</div>
+          <div class="kc-val v-red">${fmt(debt)}</div>
+          <div class="kc-sub">לחץ לפירוט לפי קטגוריה</div>
+        </div>
+        <div class="kpi-cell" onclick="goPage('debts')">
+          <div class="kc-lbl">חובות שכירות</div>
+          <div class="kc-val v-red">${fmt(debt)}</div>
+        </div>
+        <div class="kpi-cell" onclick="goPage('debts')">
+          <div class="kc-lbl">חובות דמי מפתח</div>
+          <div class="kc-val v-dim">${fmt(0)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-panel">
+      <div class="kpi-panel-hdr">
+        <span class="kpi-panel-hdr-title">ניהול ובקרה</span>
+      </div>
+      <div class="kpi-row c5">
+        <div class="kpi-cell" data-accent="red" onclick="goPage('tasks')">
+          <div class="kc-lbl">משימות דחופות</div>
+          <div class="kc-val v-red">${urgent}</div>
+          <div class="kc-sub">ממתינות לטיפול</div>
+        </div>
+        <div class="kpi-cell" data-accent="amber" onclick="goPage('tasks')">
+          <div class="kc-lbl">ממתינות להחלטה</div>
+          <div class="kc-val v-amber">${decision}</div>
+        </div>
+        <div class="kpi-cell" data-accent="amber" onclick="goPage('expenses')">
+          <div class="kc-lbl">תיקונים לא שולמו</div>
+          <div class="kc-val v-amber">${fmt(pending)}</div>
+        </div>
+        <div class="kpi-cell" data-accent="gold" onclick="goPage('properties')">
+          <div class="kc-lbl">נכסים פעילים</div>
+          <div class="kc-val v-gold">${active}<span style="font-size:12px;color:var(--t3);font-weight:400"> / ${DB.props.length}</span></div>
+        </div>
+        <div class="kpi-cell" data-accent="${legal>0?'red':'silver'}" onclick="goPage('properties')">
+          <div class="kc-lbl">הליכים משפטיים</div>
+          <div class="kc-val ${legal>0?'v-red':'v-dim'}">${legal}</div>
+          <div class="kc-sub">${DB.props.filter(p=>p.status==='בעיה').length} נכסים עם בעיות</div>
+        </div>
+      </div>
+      <div class="kpi-row c4">
+        <div class="kpi-cell" data-accent="red" onclick="goPage('contracts')">
+          <div class="kc-lbl">חוזים שפגו</div>
+          <div class="kc-val v-red">${DB.tenants.filter(t=>{const p=DB.props.find(x=>x.id===t.propId)||{};return cSt(t.end,p.tenure)==='פג'}).length}</div>
+        </div>
+        <div class="kpi-cell" data-accent="amber" onclick="goPage('contracts')">
+          <div class="kc-lbl">פגים תוך 90 יום</div>
+          <div class="kc-val v-amber">${DB.tenants.filter(t=>{const p=DB.props.find(x=>x.id===t.propId)||{};return cSt(t.end,p.tenure)==='קרוב'}).length}</div>
+        </div>
+        <div class="kpi-cell" data-accent="silver">
+          <div class="kc-lbl">נכסים ריקים</div>
+          <div class="kc-val v-dim">${DB.props.filter(p=>p.status==='ריק').length}</div>
+        </div>
+        <div class="kpi-cell" data-accent="green" onclick="goPage('tenants')">
+          <div class="kc-lbl">שוכרים פעילים</div>
+          <div class="kc-val v-green">${DB.tenants.filter(t=>t.status==='פעיל').length}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const expiring=DB.tenants.filter(t=>{const p=DB.props.find(x=>x.id===t.propId)||{};return['פג','קרוב'].includes(cSt(t.end,p.tenure))}).slice(0,8);
+  document.getElementById('dash-expiring').innerHTML=expiring.length
+    ?expiring.map(t=>{const p=DB.props.find(x=>x.id===t.propId)||{};const st=cSt(t.end,p.tenure);return`<tr onclick="openPropDetail('${p.id||''}')" style="cursor:pointer"><td class="td-bold">${esc(p.address||'—')}</td><td class="td-muted">${esc(t.name)}</td><td class="td-muted">${esc(t.end||'—')}</td><td>${badge(st)}</td></tr>`}).join('')
+    :'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">אין חוזים שדורשים תשומת לב ✓</td></tr>';
+
+  const urgList=DB.tasks.filter(t=>['דחוף','ממתין להחלטה'].includes(t.priority)&&t.status!=='סגור').slice(0,6);
+  document.getElementById('dash-tasks').innerHTML=urgList.length
+    ?urgList.map(t=>`<tr onclick="openTaskDetail('${t.id}')" style="cursor:pointer"><td class="td-bold">${esc(t.title)}</td><td class="td-muted">${esc(propAddr(t.propId))}</td><td>${badge(t.priority)}</td></tr>`).join('')
+    :'<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text3)">אין משימות דחופות ✓</td></tr>';
+
+  document.getElementById('dash-finance').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span class="td-muted">הכנסות שכ"ד</span>
+        <span class="text-green" style="font-weight:500;font-size:14px">${fmt(inc)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span class="td-muted">הוצאות</span>
+        <span class="text-red" style="font-weight:500;font-size:14px">${fmt(exp)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+        <span style="font-weight:600;font-size:13px">יתרה נטו</span>
+        <span style="font-weight:700;font-size:17px;color:${inc-exp>=0?'var(--green)':'var(--red)'}">${fmt(inc-exp)}</span>
+      </div>
+    </div>`;
+
+  const own={הקדש:0,עמותה:0,פרטי:0};
+  const ten={שכירות:0,'דמי מפתח':0};
+  DB.props.forEach(p=>{if(own[p.ownership]!==undefined)own[p.ownership]++;if(ten[p.tenure]!==undefined)ten[p.tenure]++});
+  document.getElementById('dash-breakdown').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:7px">
+      ${Object.entries(own).map(([k,v])=>`<div style="display:flex;justify-content:space-between;align-items:center">${badge(k)}<span style="font-weight:600;font-size:14px;color:var(--text)">${v}</span></div>`).join('')}
+      <div style="border-top:1px solid var(--border);margin:6px 0"></div>
+      ${Object.entries(ten).map(([k,v])=>`<div style="display:flex;justify-content:space-between;align-items:center">${badge(k)}<span style="font-weight:600;font-size:14px;color:var(--text)">${v}</span></div>`).join('')}
+    </div>`;
+}
+
+// ─── Properties ──────────────────────────────────────────────────────────────
+function renderProperties(){
+  const q=(document.getElementById('fp-search')?.value||'').toLowerCase();
+  const fo=document.getElementById('fp-own')?.value||'';
+  const ft=document.getElementById('fp-ten')?.value||'';
+  const fs=document.getElementById('fp-sta')?.value||'';
+  let rows=DB.props.filter(p=>{
+    if(q&&!(p.address+p.notes).toLowerCase().includes(q))return false;
+    if(fo&&p.ownership!==fo)return false;
+    if(ft&&p.tenure!==ft)return false;
+    if(fs&&p.status!==fs)return false;
+    return true;
+  }).sort((a,b)=>a.address.localeCompare(b.address,'he'));
+  document.getElementById('prop-tbody').innerHTML=rows.length
+    ?rows.map(p=>{const t=DB.tenants.find(x=>x.propId===p.id&&x.status==='פעיל');const st=cSt(t?.end,p.tenure);return`<tr>
+      <td class="td-bold" style="cursor:pointer" onclick="openPropDetail('${p.id}')">${esc(p.address)}</td>
+      <td>${badge(p.ownership)}</td><td>${badge(p.tenure)}</td>
+      <td style="font-weight:500;color:var(--gold2)">${p.rent&&p.rent!=='0'?fmt(p.rent):'—'}</td>
+      <td>${badge(p.status)}</td>
+      <td class="td-muted">${esc(t?.name||'ריק')}</td>
+      <td>${t?.end?`<span class="${cSt(t.end,p.tenure)==='פג'?'text-red':cSt(t.end,p.tenure)==='קרוב'?'text-orange':'td-muted'}">${esc(t.end)}</span>`:'—'}</td>
+      <td><div class="flex gap8"><button class="btn-icon" onclick="openPropDetail('${p.id}')">↗</button><button class="btn-icon" onclick="editProp('${p.id}')">✎</button></div></td>
+    </tr>`}).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text3)">לא נמצאו נכסים</td></tr>';
+}
+
+// ─── Tenants ─────────────────────────────────────────────────────────────────
+function renderTenants(){
+  const q=(document.getElementById('ft-search')?.value||'').toLowerCase();
+  const fs=document.getElementById('ft-sta')?.value||'';
+  let rows=DB.tenants.filter(t=>{
+    if(q&&!(t.name+t.phone1).toLowerCase().includes(q))return false;
+    if(fs&&t.status!==fs)return false;
+    return true;
+  }).sort((a,b)=>a.name.localeCompare(b.name,'he'));
+  document.getElementById('ten-tbody').innerHTML=rows.length
+    ?rows.map(t=>{const p=DB.props.find(x=>x.id===t.propId)||{};return`<tr>
+      <td class="td-bold" style="cursor:pointer" onclick="openTenantDetail('${t.id}')">${esc(t.name)}</td>
+      <td class="td-muted">${esc(p.address||'—')}</td>
+      <td class="td-muted" dir="ltr">${esc(t.phone1||'—')}</td>
+      <td class="td-muted">${esc(t.start||'—')}</td>
+      <td class="td-muted">${esc(t.end||'—')}</td>
+      <td style="color:var(--gold2)">${t.rent&&t.rent!=='0'?fmt(t.rent):'—'}</td>
+      <td>${badge(t.status)}</td>
+      <td>${xfer(t.elec)}</td><td>${xfer(t.water)}</td><td>${xfer(t.arnona)}</td>
+      <td><button class="btn-icon" onclick="openTenantDetail('${t.id}')">↗</button></td>
+    </tr>`}).join('')
+    :'<tr><td colspan="11" style="text-align:center;padding:28px;color:var(--text3)">לא נמצאו שוכרים</td></tr>';
+}
+
+// ─── Finance ─────────────────────────────────────────────────────────────────
+function renderFinance(){
+  const{start,end}=prevMonthRange();
+  let inc=0,exp=0,debt=0;
+  DB.payments.forEach(p=>{const d=parseDate(p.date);if(d&&d>=start&&d<=end)inc+=Number(p.paid||0);if(p.status==='חוב')debt+=Math.abs(Number(p.expected||0)-Number(p.paid||0))});
+  DB.expenses.forEach(e=>{const d=parseDate(e.date);if(d&&d>=start&&d<=end)exp+=Number(e.amount||0)});
+  document.getElementById('fin-kpis').innerHTML=`
+    <div class="kpi green"><div class="kpi-lbl">הכנסות חודש שעבר</div><div class="kpi-val">${fmt(inc)}</div></div>
+    <div class="kpi red"><div class="kpi-lbl">הוצאות חודש שעבר</div><div class="kpi-val">${fmt(exp)}</div></div>
+    <div class="kpi ${inc-exp>=0?'cyan':'red'}"><div class="kpi-lbl">יתרה</div><div class="kpi-val">${fmt(inc-exp)}</div></div>
+    <div class="kpi red"><div class="kpi-lbl">חובות פתוחים</div><div class="kpi-val">${fmt(debt)}</div></div>
+  `;
+  const q=(document.getElementById('ff-search')?.value||'').toLowerCase();
+  const fs=document.getElementById('ff-sta')?.value||'';
+  const fa=document.getElementById('ff-addr')?.value||'';
+  let rows=DB.payments.filter(p=>{
+    const addr=propAddr(p.propId);
+    if(q&&!(addr+(p.notes||'')).toLowerCase().includes(q))return false;
+    if(fs&&p.status!==fs)return false;
+    if(fa&&propAddr(p.propId)!==fa)return false;
+    return true;
+  }).sort((a,b)=>(b.period||'').localeCompare(a.period||''));
+  document.getElementById('fin-tbody').innerHTML=rows.length
+    ?rows.map(p=>{const t=DB.tenants.find(x=>x.id===p.tenantId);const bal=Number(p.paid||0)-Number(p.expected||0);return`<tr>
+      <td class="td-bold">${esc(propAddr(p.propId))}</td>
+      <td class="td-muted">${esc(t?.name||'—')}</td>
+      <td class="td-muted">${esc(p.period||'—')}</td>
+      <td>${fmt(p.expected)}</td><td>${fmt(p.paid)}</td>
+      <td style="font-weight:600;color:${bal>=0?'var(--green)':'var(--red)'}">${fmt(bal)}</td>
+      <td>${badge(p.status)}</td>
+      <td class="td-muted">${esc(p.date||'—')}</td>
+      <td class="td-muted">${esc(p.method||'—')}</td>
+      <td><button class="btn-icon" onclick="editPayment('${p.id}')">✎</button></td>
+    </tr>`}).join('')
+    :'<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--text3)">אין תשלומים</td></tr>';
+}
+
+// ─── Debts ───────────────────────────────────────────────────────────────────
+function renderDebts(){
+  const debts=DB.payments.filter(p=>p.status==='חוב'||Number(p.paid||0)<Number(p.expected||0));
+  const bySk=debts.filter(p=>{const pr=DB.props.find(x=>x.id===p.propId);return!pr||pr.tenure==='שכירות'});
+  const byDmf=debts.filter(p=>{const pr=DB.props.find(x=>x.id===p.propId);return pr&&pr.tenure==='דמי מפתח'});
+  const byHk=debts.filter(p=>{const pr=DB.props.find(x=>x.id===p.propId);return pr&&pr.ownership==='הקדש'});
+  const byAm=debts.filter(p=>{const pr=DB.props.find(x=>x.id===p.propId);return pr&&pr.ownership==='עמותה'});
+  const total=debts.reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0);
+  document.getElementById('debt-kpis').innerHTML=`
+    <div class="kpi red"><div class="kpi-lbl">סה"כ חובות</div><div class="kpi-val">${fmt(total)}</div><div class="kpi-sub">${debts.length} רשומות</div></div>
+    <div class="kpi orange"><div class="kpi-lbl">שכירות</div><div class="kpi-val">${fmt(bySk.reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0))}</div></div>
+    <div class="kpi cyan"><div class="kpi-lbl">דמי מפתח</div><div class="kpi-val">${fmt(byDmf.reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0))}</div></div>
+    <div class="kpi gold"><div class="kpi-lbl">הקדש</div><div class="kpi-val">${fmt(byHk.reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0))}</div></div>
+  `;
+  function debtSec(title,items){
+    if(!items.length)return'';
+    const tot=items.reduce((s,p)=>s+Math.abs(Number(p.expected||0)-Number(p.paid||0)),0);
+    return`<div class="debt-card">
+      <div class="debt-card-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+        <h3>${title}</h3>
+        <div class="flex gap8 ac"><span style="font-size:16px;font-weight:300;color:var(--red)">${fmt(tot)}</span><span style="color:var(--text3);font-size:11px">▼ ${items.length} רשומות</span></div>
+      </div>
+      <div class="debt-card-body">
+        <table><thead><tr><th>נכס</th><th>שוכר</th><th>חודש</th><th>סכום חוב</th><th>בעלות</th><th>סוג</th><th></th></tr></thead>
+        <tbody>${items.map(p=>{const pr=DB.props.find(x=>x.id===p.propId)||{};const t=DB.tenants.find(x=>x.id===p.tenantId)||{};const d=Math.abs(Number(p.expected||0)-Number(p.paid||0));return`<tr>
+          <td class="td-bold" style="cursor:pointer" onclick="openPropDetail('${pr.id||''}')">${esc(pr.address||p.propId)}</td>
+          <td class="td-muted">${esc(t.name||'—')}</td><td class="td-muted">${esc(p.period||'—')}</td>
+          <td style="font-weight:700;color:var(--red)">${fmt(d)}</td>
+          <td>${badge(pr.ownership||'')}</td><td>${badge(pr.tenure||'')}</td>
+          <td><button class="btn-icon" onclick="editPayment('${p.id}')">✎</button></td>
+        </tr>`}).join('')}</tbody></table>
+      </div></div>`;
+  }
+  document.getElementById('debt-sections').innerHTML=
+    debtSec('חובות שכירות',bySk)+debtSec('חובות דמי מפתח',byDmf)+
+    debtSec('חובות הקדש',byHk)+debtSec('חובות עמותה',byAm)||
+    '<div style="text-align:center;padding:48px;color:var(--text3);font-size:13px">אין חובות פתוחים 🎉</div>';
+}
+
+// ─── Expenses ────────────────────────────────────────────────────────────────
+function renderExpenses(){
+  const pending=DB.expenses.filter(e=>e.status==='ממתין').reduce((s,e)=>s+Number(e.amount||0),0);
+  const paid=DB.expenses.filter(e=>e.status==='שולם').reduce((s,e)=>s+Number(e.amount||0),0);
+  document.getElementById('exp-kpis').innerHTML=`
+    <div class="kpi red"><div class="kpi-lbl">ממתין לתשלום</div><div class="kpi-val">${fmt(pending)}</div></div>
+    <div class="kpi green"><div class="kpi-lbl">שולם סה"כ</div><div class="kpi-val">${fmt(paid)}</div></div>
+    <div class="kpi gold"><div class="kpi-lbl">סה"כ הוצאות</div><div class="kpi-val">${fmt(pending+paid)}</div></div>
+  `;
+  const q=(document.getElementById('fe-search')?.value||'').toLowerCase();
+  const fs=document.getElementById('fe-sta')?.value||'';
+  const fc=document.getElementById('fe-cat')?.value||'';
+  let rows=DB.expenses.filter(e=>{
+    if(q&&!(propAddr(e.propId)+e.desc+e.supplier).toLowerCase().includes(q))return false;
+    if(fs&&e.status!==fs)return false;
+    if(fc&&e.category!==fc)return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('exp-tbody').innerHTML=rows.length
+    ?rows.map(e=>`<tr>
+      <td class="td-bold">${esc(propAddr(e.propId))}</td>
+      <td class="td-muted">${esc(e.date||'—')}</td>
+      <td>${badge(e.category)}</td>
+      <td>${esc(e.desc||'—')}${e.notes?`<div class="td-muted" style="font-size:11px;margin-top:2px">${esc(e.notes)}</div>`:''}</td>
+      <td style="font-weight:600">${fmt(e.amount)}</td>
+      <td>${badge(e.status)}</td>
+      <td class="td-muted">${esc(e.supplier||'—')}</td>
+      <td><button class="btn-icon" onclick="editExpense('${e.id}')">✎</button></td>
+    </tr>`).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text3)">אין הוצאות</td></tr>';
+}
+
+// ─── Tasks ───────────────────────────────────────────────────────────────────
+function renderTasks(){
+  const urgent=DB.tasks.filter(t=>t.priority==='דחוף'&&t.status!=='סגור').length;
+  const decision=DB.tasks.filter(t=>t.priority==='ממתין להחלטה'&&t.status!=='סגור').length;
+  document.getElementById('task-kpis').innerHTML=`
+    <div class="kpi red"><div class="kpi-lbl">דחופות</div><div class="kpi-val">${urgent}</div><div class="kpi-sub">פתוחות</div></div>
+    <div class="kpi orange"><div class="kpi-lbl">ממתינות להחלטה</div><div class="kpi-val">${decision}</div><div class="kpi-sub">פתוחות</div></div>
+    <div class="kpi cyan"><div class="kpi-lbl">סה"כ פתוחות</div><div class="kpi-val">${DB.tasks.filter(t=>t.status!=='סגור').length}</div></div>
+  `;
+  const q=(document.getElementById('ftk-search')?.value||'').toLowerCase();
+  const fp=document.getElementById('ftk-pri')?.value||'';
+  const fs=document.getElementById('ftk-sta')?.value||'';
+  let rows=DB.tasks.filter(t=>{
+    if(q&&!(t.title+propAddr(t.propId)+t.desc).toLowerCase().includes(q))return false;
+    if(fp&&t.priority!==fp)return false;
+    if(fs&&t.status!==fs)return false;
+    return true;
+  }).sort((a,b)=>({דחוף:0,'ממתין להחלטה':1,שוטף:2}[a.priority]??9)-({דחוף:0,'ממתין להחלטה':1,שוטף:2}[b.priority]??9));
+  document.getElementById('task-tbody').innerHTML=rows.length
+    ?rows.map(t=>`<tr style="cursor:pointer" onclick="openTaskDetail('${t.id}')">
+      <td class="td-bold">${esc(t.title)}</td>
+      <td class="td-muted">${esc(propAddr(t.propId)||'כללי')}</td>
+      <td>${badge(t.priority)}</td><td>${badge(t.status)}</td>
+      <td class="td-muted">${esc(t.due||'—')}</td>
+      <td class="td-muted">${esc(t.assigned||'—')}</td>
+      <td><button class="btn-icon" onclick="event.stopPropagation();editTask('${t.id}')">✎</button></td>
+    </tr>`).join('')
+    :'<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--text3)">אין משימות</td></tr>';
+}
+
+// ─── Notes ───────────────────────────────────────────────────────────────────
+function renderNotes(){
+  const q=(document.getElementById('fn-search')?.value||'').toLowerCase();
+  const fa=document.getElementById('fn-addr')?.value||'';
+  let rows=DB.notes.filter(n=>{
+    if(q&&!(n.title+n.content+n.author).toLowerCase().includes(q))return false;
+    if(fa){const p=DB.props.find(x=>x.address===fa);if(!p||n.entityId!==p.id)return false}
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('notes-list').innerHTML=rows.length
+    ?rows.map(n=>`<div class="note-card" onclick="editNote('${n.id}')">
+      <div class="flex ac gap8" style="margin-bottom:8px">
+        <div style="flex:1">
+          ${n.title?`<div style="font-size:13px;font-weight:600;color:var(--text)">${esc(n.title)}</div>`:''}
+          ${n.entityId?`<div style="font-size:11px;color:var(--gold2);margin-top:2px">${esc(n.entityId)}</div>`:''}
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:left">${esc(n.date||'')}${n.author?' · '+esc(n.author):''}</div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;white-space:pre-wrap">${esc((n.content||'').substring(0,400))}${(n.content||'').length>400?'...':''}</div>
+    </div>`).join('')
+    :'<div style="text-align:center;padding:48px;color:var(--text3)">אין הערות. לחץ "+ הערה" להוספה.</div>';
+}
+
+// ─── Contracts ───────────────────────────────────────────────────────────────
+function renderContracts(){
+  const q=(document.getElementById('fc-search')?.value||'').toLowerCase();
+  const fs=document.getElementById('fc-sta')?.value||'';
+  let rows=[];
+  DB.tenants.forEach(t=>{
+    const p=DB.props.find(x=>x.id===t.propId)||{};
+    const st=cSt(t.end,p.tenure);
+    if(q&&!(p.address+t.name).toLowerCase().includes(q))return;
+    if(fs&&st!==fs)return;
+    rows.push({...t,prop:p,st});
+  });
+  rows.sort((a,b)=>({'פג':0,'קרוב':1,'תקף':2,'dmf':3}[a.st]??4)-({'פג':0,'קרוב':1,'תקף':2,'dmf':3}[b.st]??4));
+  document.getElementById('contracts-tbody').innerHTML=rows.length
+    ?rows.map(t=>`<tr>
+      <td class="td-bold" style="cursor:pointer" onclick="openPropDetail('${t.prop.id||''}')">${esc(t.prop.address||'—')}</td>
+      <td>${esc(t.name||'—')}</td>
+      <td>${badge(t.prop.tenure)}</td><td>${badge(t.prop.ownership)}</td>
+      <td class="td-muted">${esc(t.end||'—')}</td>
+      <td>${badge(t.st)}</td>
+      <td style="color:var(--gold2)">${t.rent&&t.rent!=='0'?fmt(t.rent):'—'}</td>
+      <td><button class="btn-icon" onclick="editProp('${t.prop.id||''}')">✎</button></td>
+    </tr>`).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--text3)">לא נמצאו חוזים</td></tr>';
+}
+
+// ─── Detail Drawers ──────────────────────────────────────────────────────────
+function openPropDetail(id){
+  const p=DB.props.find(x=>x.id===id);if(!p)return;
+  const tenants=DB.tenants.filter(t=>t.propId===id);
+  const notes=DB.notes.filter(n=>n.entityId===id);
+  const fins=DB.payments.filter(x=>x.propId===id);
+  const inc=fins.reduce((s,x)=>s+Number(x.paid||0),0);
+  const debt=fins.filter(x=>x.status==='חוב').reduce((s,x)=>s+Math.abs(Number(x.expected||0)-Number(x.paid||0)),0);
+  document.getElementById('drawer-content').innerHTML=`
+    <div class="drawer-hdr">
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:3px">${esc(p.address)}</div>
+        <div style="font-size:12px;color:var(--text3)">${esc(p.city||'')}${p.block?` · גוש ${esc(p.block)}`:''}</div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${badge(p.status)}${badge(p.ownership)}${badge(p.tenure)}</div>
+      </div>
+      <button class="btn-icon" onclick="closeDrawer()" style="font-size:16px">✕</button>
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">פרטי נכס</div>
+      ${p.rent&&p.rent!=='0'?`<div class="drow"><span class="dkey">שכ"ד</span><span class="dval text-gold" style="font-size:15px;font-weight:500">${fmt(p.rent)}</span></div>`:''}
+      ${p.rooms?`<div class="drow"><span class="dkey">חדרים</span><span class="dval">${esc(p.rooms)}</span></div>`:''}
+      ${p.arnona?`<div class="drow"><span class="dkey">ארנונה</span><span class="dval">${esc(p.arnona)}</span></div>`:''}
+      ${p.water?`<div class="drow"><span class="dkey">מים</span><span class="dval">${esc(p.water)}</span></div>`:''}
+      ${p.elec?`<div class="drow"><span class="dkey">חשמל</span><span class="dval">${esc(p.elec)}</span></div>`:''}
+      ${p.tabu?`<div class="drow"><span class="dkey">טאבו</span><span class="dval"><a href="${esc(p.tabu)}" target="_blank" style="color:var(--cyan)">פתח נסח ↗</a></span></div>`:''}
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">שוכרים (${tenants.length})</div>
+      ${tenants.length?tenants.map(t=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openTenantDetail('${t.id}')">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${esc(t.name)}</div>
+        <div style="font-size:11.5px;color:var(--text3);margin-top:2px">${esc(t.phone1||'')} · חוזה עד ${esc(t.end||'—')}</div>
+        <div style="margin-top:5px">${badge(cSt(t.end,p.tenure))}</div>
+      </div>`).join(''):'<div style="color:var(--text3);font-size:13px">אין שוכרים</div>'}
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">סיכום כספי</div>
+      <div class="drow"><span class="dkey">התקבל</span><span class="dval text-green" style="font-weight:500">${fmt(inc)}</span></div>
+      <div class="drow"><span class="dkey">חוב פתוח</span><span class="dval text-red" style="font-weight:500">${fmt(debt)}</span></div>
+    </div>
+    ${p.notes?`<div class="drawer-sec"><div class="drawer-sec-title">הערות על הנכס</div><div style="font-size:13px;line-height:1.65;color:var(--text2);white-space:pre-wrap">${esc(p.notes)}</div></div>`:''}
+    <div class="drawer-sec">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="drawer-sec-title" style="margin:0">הערות ומסמכים (${notes.length})</div>
+        <button class="btn btn-outline btn-sm" onclick="openAddNoteFor('${p.id}')">+ הוסף</button>
+      </div>
+      ${notes.slice(-3).reverse().map(n=>`<div style="padding:9px;background:rgba(255,255,255,.03);border-radius:var(--r-sm);margin-bottom:6px;cursor:pointer;border:1px solid var(--border)" onclick="editNote('${n.id}')">
+        <div style="font-size:10.5px;color:var(--text3);margin-bottom:3px">${esc(n.date||'')}${n.author?' · '+esc(n.author):''}</div>
+        ${n.title?`<div style="font-size:12.5px;font-weight:500;margin-bottom:2px">${esc(n.title)}</div>`:''}
+        <div style="font-size:12.5px;color:var(--text2)">${esc((n.content||'').substring(0,150))}${n.content?.length>150?'...':''}</div>
+      </div>`).join('')||'<div style="color:var(--text3);font-size:13px">אין הערות</div>'}
+    </div>
+    <div style="padding:14px 24px;display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="editProp('${p.id}')">✎ עריכה</button>
+      <button class="btn btn-outline btn-sm" onclick="openAddPaymentFor('${p.id}')">+ תשלום</button>
+    </div>
+  `;
+  document.getElementById('drawer').classList.add('open');
+}
+
+function openTenantDetail(id){
+  const t=DB.tenants.find(x=>x.id===id);if(!t)return;
+  const p=DB.props.find(x=>x.id===t.propId)||{};
+  const payments=DB.payments.filter(x=>x.tenantId===id||x.propId===t.propId);
+  const debt=payments.filter(x=>x.status==='חוב').reduce((s,x)=>s+Math.abs(Number(x.expected||0)-Number(x.paid||0)),0);
+  document.getElementById('drawer-content').innerHTML=`
+    <div class="drawer-hdr">
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;color:var(--text)">${esc(t.name)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(p.address||'—')}</div>
+        <div style="margin-top:8px">${badge(cSt(t.end,p.tenure))}</div>
+      </div>
+      <button class="btn-icon" onclick="closeDrawer()" style="font-size:16px">✕</button>
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">פרטי שוכר</div>
+      <div class="drow"><span class="dkey">טלפון</span><span class="dval" dir="ltr">${esc(t.phone1||'—')}</span></div>
+      ${t.phone2?`<div class="drow"><span class="dkey">טלפון 2</span><span class="dval" dir="ltr">${esc(t.phone2)}</span></div>`:''}
+      <div class="drow"><span class="dkey">חוזה מ-</span><span class="dval">${esc(t.start||'—')}</span></div>
+      <div class="drow"><span class="dkey">חוזה עד</span><span class="dval">${esc(t.end||'—')}</span></div>
+      <div class="drow"><span class="dkey">שכ"ד</span><span class="dval text-gold" style="font-weight:500">${fmt(t.rent)}</span></div>
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">העברת חשבונות</div>
+      <div class="drow"><span class="dkey">חשמל</span><span class="dval">${xfer(t.elec)}</span></div>
+      <div class="drow"><span class="dkey">מים</span><span class="dval">${xfer(t.water)}</span></div>
+      <div class="drow"><span class="dkey">ארנונה</span><span class="dval">${xfer(t.arnona)}</span></div>
+    </div>
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">היסטוריית תשלומים</div>
+      <div class="drow"><span class="dkey">חוב פתוח</span><span class="dval text-red" style="font-weight:600">${fmt(debt)}</span></div>
+      ${payments.slice(-5).reverse().map(pay=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+        <span class="td-muted">${esc(pay.period||pay.date||'—')}</span>
+        <span style="font-weight:500;color:${pay.status==='שולם'?'var(--green)':'var(--red)'}">${fmt(pay.paid)} / ${fmt(pay.expected)}</span>
+        ${badge(pay.status)}
+      </div>`).join('')}
+    </div>
+    <div style="padding:14px 24px;display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="openAddPaymentFor('${t.propId}','${t.id}')">+ תשלום</button>
+      <button class="btn btn-outline btn-sm" onclick="openAddNoteFor('${t.propId}')">+ הערה</button>
+    </div>
+  `;
+  document.getElementById('drawer').classList.add('open');
+}
+
+function openTaskDetail(id){
+  const t=DB.tasks.find(x=>x.id===id);if(!t)return;
+  const p=DB.props.find(x=>x.id===t.propId)||{};
+  const relNotes=DB.notes.filter(n=>n.entityId===t.id);
+  document.getElementById('drawer-content').innerHTML=`
+    <div class="drawer-hdr">
+      <div style="flex:1">
+        <div style="font-size:16px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${esc(p.address||'כללי')}</div>
+        <div style="margin-top:8px;display:flex;gap:5px">${badge(t.priority)}${badge(t.status)}</div>
+      </div>
+      <button class="btn-icon" onclick="closeDrawer()" style="font-size:16px">✕</button>
+    </div>
+    ${t.desc?`<div class="drawer-sec"><div class="drawer-sec-title">תיאור</div><div style="font-size:13px;line-height:1.65;color:var(--text2);white-space:pre-wrap">${esc(t.desc)}</div></div>`:''}
+    <div class="drawer-sec">
+      <div class="drawer-sec-title">פרטים</div>
+      ${t.due?`<div class="drow"><span class="dkey">תאריך יעד</span><span class="dval">${esc(t.due)}</span></div>`:''}
+      ${t.assigned?`<div class="drow"><span class="dkey">אחראי</span><span class="dval">${esc(t.assigned)}</span></div>`:''}
+    </div>
+    <div class="drawer-sec">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="drawer-sec-title" style="margin:0">הערות (${relNotes.length})</div>
+        <button class="btn btn-outline btn-sm" onclick="openAddNoteFor('${t.id}')">+ הוסף</button>
+      </div>
+      ${relNotes.map(n=>`<div style="padding:9px;background:rgba(255,255,255,.03);border-radius:var(--r-sm);margin-bottom:6px;border:1px solid var(--border);cursor:pointer" onclick="editNote('${n.id}')">
+        <div style="font-size:10.5px;color:var(--text3)">${esc(n.date||'')}${n.author?' · '+esc(n.author):''}</div>
+        ${n.title?`<div style="font-size:12.5px;font-weight:500;margin-top:2px">${esc(n.title)}</div>`:''}
+        <div style="font-size:12.5px;color:var(--text2);margin-top:2px;white-space:pre-wrap">${esc((n.content||'').substring(0,200))}</div>
+      </div>`).join('')||'<div style="color:var(--text3);font-size:13px">אין הערות</div>'}
+    </div>
+    <div style="padding:14px 24px"><button class="btn btn-outline btn-sm" onclick="editTask('${t.id}')">✎ עריכה</button></div>
+  `;
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+
+// ─── CRUD ────────────────────────────────────────────────────────────────────
+let editPropId=null,editPayId=null,editExpId=null,editTaskId=null,editNoteId=null;
+
+function openAddProp(){editPropId=null;document.getElementById('pm-title').textContent='נכס חדש';document.getElementById('pm-del').style.display='none';['address','city','arnona','water','elec','wmeter','tabu','notes','block','parcel','rooms','area'].forEach(f=>{const el=document.getElementById('pm-'+f);if(el)el.value=f==='city'?'ירושלים':''});document.getElementById('pm-rent').value='';document.getElementById('prop-modal').classList.add('open')}
+function editProp(id){const p=DB.props.find(x=>x.id===id);if(!p)return;editPropId=id;document.getElementById('pm-title').textContent='עריכת נכס';document.getElementById('pm-del').style.display='';document.getElementById('pm-address').value=p.address||'';document.getElementById('pm-city').value=p.city||'';document.getElementById('pm-own').value=p.ownership||'הקדש';document.getElementById('pm-ten').value=p.tenure||'שכירות';document.getElementById('pm-sta').value=p.status||'פעיל';document.getElementById('pm-rent').value=p.rent||'';document.getElementById('pm-rooms').value=p.rooms||'';document.getElementById('pm-area').value=p.area||'';document.getElementById('pm-block').value=p.block||'';document.getElementById('pm-parcel').value=p.parcel||'';document.getElementById('pm-arnona').value=p.arnona||'';document.getElementById('pm-water').value=p.water||'';document.getElementById('pm-elec').value=p.elec||'';document.getElementById('pm-wmeter').value=p.wmeter||'';document.getElementById('pm-tabu').value=p.tabu||'';document.getElementById('pm-notes').value=p.notes||'';document.getElementById('prop-modal').classList.add('open')}
+function closePropModal(){document.getElementById('prop-modal').classList.remove('open')}
+function saveProp(){const g=id=>document.getElementById(id).value.trim();const rec={address:g('pm-address'),city:g('pm-city'),ownership:g('pm-own'),tenure:g('pm-ten'),status:g('pm-sta'),rent:g('pm-rent'),rooms:g('pm-rooms'),area:g('pm-area'),block:g('pm-block'),parcel:g('pm-parcel'),arnona:g('pm-arnona'),water:g('pm-water'),elec:g('pm-elec'),wmeter:g('pm-wmeter'),tabu:g('pm-tabu'),notes:g('pm-notes')};if(editPropId){const i=DB.props.findIndex(x=>x.id===editPropId);DB.props[i]={...DB.props[i],...rec}}else DB.props.push({...rec,id:'PROP-'+Date.now()});persist();closePropModal();renderCurrent()}
+function delProp(){if(!confirm('למחוק נכס זה?'))return;DB.props=DB.props.filter(x=>x.id!==editPropId);persist();closePropModal();renderCurrent()}
+
+function openAddPayment(){editPayId=null;populateAddr();document.getElementById('pay-title').textContent='תשלום חדש';document.getElementById('pay-del').style.display='none';document.getElementById('pay-date').value=todayStr();['expected','paid','period','ref','notes'].forEach(f=>document.getElementById('pay-'+f).value='');document.getElementById('pay-modal').classList.add('open')}
+function openAddPaymentFor(propId){openAddPayment();setTimeout(()=>{const addr=DB.props.find(p=>p.id===propId)?.address;if(addr)document.getElementById('pay-addr').value=addr},50)}
+function editPayment(id){const p=DB.payments.find(x=>x.id===id);if(!p)return;editPayId=id;populateAddr();document.getElementById('pay-title').textContent='עריכת תשלום';document.getElementById('pay-del').style.display='';const addr=propAddr(p.propId);setTimeout(()=>document.getElementById('pay-addr').value=addr,50);document.getElementById('pay-period').value=p.period||'';document.getElementById('pay-date').value=p.date||'';document.getElementById('pay-expected').value=p.expected||'';document.getElementById('pay-paid').value=p.paid||'';document.getElementById('pay-method').value=p.method||'העברה בנקאית';document.getElementById('pay-sta').value=p.status||'שולם';document.getElementById('pay-ref').value=p.ref||'';document.getElementById('pay-notes').value=p.notes||'';document.getElementById('pay-modal').classList.add('open')}
+function closePayModal(){document.getElementById('pay-modal').classList.remove('open')}
+function savePayment(){const g=id=>document.getElementById(id).value.trim();const addr=g('pay-addr');const prop=DB.props.find(p=>p.address===addr)||{};const rec={propId:prop.id||addr,date:g('pay-date'),period:g('pay-period'),expected:g('pay-expected'),paid:g('pay-paid'),method:g('pay-method'),status:g('pay-sta'),ref:g('pay-ref'),notes:g('pay-notes')};if(editPayId){const i=DB.payments.findIndex(x=>x.id===editPayId);DB.payments[i]={...DB.payments[i],...rec}}else DB.payments.push({...rec,id:'PAY-'+Date.now()});persist();closePayModal();renderCurrent()}
+function delPayment(){if(!confirm('למחוק?'))return;DB.payments=DB.payments.filter(x=>x.id!==editPayId);persist();closePayModal();renderCurrent()}
+
+function openAddExpense(){editExpId=null;populateAddr();document.getElementById('exp-title').textContent='הוצאה חדשה';document.getElementById('em-del').style.display='none';document.getElementById('em-date').value=todayStr();['amount','desc','supplier','notes'].forEach(f=>document.getElementById('em-'+f).value='');document.getElementById('exp-modal').classList.add('open')}
+function editExpense(id){const e=DB.expenses.find(x=>x.id===id);if(!e)return;editExpId=id;populateAddr();document.getElementById('exp-title').textContent='עריכת הוצאה';document.getElementById('em-del').style.display='';const addr=propAddr(e.propId);setTimeout(()=>document.getElementById('em-addr').value=addr,50);document.getElementById('em-date').value=e.date||'';document.getElementById('em-cat').value=e.category||'תיקון';document.getElementById('em-amount').value=e.amount||'';document.getElementById('em-desc').value=e.desc||'';document.getElementById('em-sta').value=e.status||'ממתין';document.getElementById('em-supplier').value=e.supplier||'';document.getElementById('em-notes').value=e.notes||'';document.getElementById('exp-modal').classList.add('open')}
+function closeExpModal(){document.getElementById('exp-modal').classList.remove('open')}
+function saveExpense(){const g=id=>document.getElementById(id).value.trim();const addr=g('em-addr');const prop=DB.props.find(p=>p.address===addr)||{};const rec={propId:prop.id||addr,date:g('em-date'),category:g('em-cat'),amount:g('em-amount'),desc:g('em-desc'),status:g('em-sta'),supplier:g('em-supplier'),notes:g('em-notes')};if(editExpId){const i=DB.expenses.findIndex(x=>x.id===editExpId);DB.expenses[i]={...DB.expenses[i],...rec}}else DB.expenses.push({...rec,id:'EXP-'+Date.now()});persist();closeExpModal();renderCurrent()}
+function delExpense(){if(!confirm('למחוק?'))return;DB.expenses=DB.expenses.filter(x=>x.id!==editExpId);persist();closeExpModal();renderCurrent()}
+
+function openAddTask(){editTaskId=null;populateAddr();document.getElementById('task-title').textContent='משימה חדשה';document.getElementById('tm-del').style.display='none';['title','due','assigned','desc'].forEach(f=>document.getElementById('tm-'+f).value='');document.getElementById('task-modal').classList.add('open')}
+function editTask(id){const t=DB.tasks.find(x=>x.id===id);if(!t)return;editTaskId=id;populateAddr();document.getElementById('task-title').textContent='עריכת משימה';document.getElementById('tm-del').style.display='';const addr=propAddr(t.propId);setTimeout(()=>document.getElementById('tm-addr').value=addr,50);document.getElementById('tm-title').value=t.title||'';document.getElementById('tm-pri').value=t.priority||'דחוף';document.getElementById('tm-sta').value=t.status||'פתוח';document.getElementById('tm-due').value=t.due||'';document.getElementById('tm-assigned').value=t.assigned||'';document.getElementById('tm-desc').value=t.desc||'';document.getElementById('task-modal').classList.add('open')}
+function closeTaskModal(){document.getElementById('task-modal').classList.remove('open')}
+function saveTask(){const g=id=>document.getElementById(id).value.trim();const addr=g('tm-addr');const prop=DB.props.find(p=>p.address===addr)||{};const rec={title:g('tm-title'),propId:prop.id||addr,priority:g('tm-pri'),status:g('tm-sta'),due:g('tm-due'),assigned:g('tm-assigned'),desc:g('tm-desc')};if(editTaskId){const i=DB.tasks.findIndex(x=>x.id===editTaskId);DB.tasks[i]={...DB.tasks[i],...rec}}else DB.tasks.push({...rec,id:'TSK-'+Date.now()});persist();closeTaskModal();renderCurrent()}
+function delTask(){if(!confirm('למחוק?'))return;DB.tasks=DB.tasks.filter(x=>x.id!==editTaskId);persist();closeTaskModal();renderCurrent()}
+
+function openAddNote(){editNoteId=null;populateAddr();document.getElementById('note-modal-title').textContent='הערה חדשה';document.getElementById('nm-del').style.display='none';document.getElementById('nm-date').value=todayStr();document.getElementById('nm-author').value='';['title','content'].forEach(f=>document.getElementById('nm-'+f).value='');document.getElementById('note-modal').classList.add('open')}
+function openAddNoteFor(entityId){openAddNote();setTimeout(()=>{const nm=document.getElementById('nm-addr');if(nm){const p=DB.props.find(x=>x.id===entityId);const addr=p?.address||entityId;const opt=[...nm.options].find(o=>o.value===addr);if(opt)nm.value=addr}},60)}
+function editNote(id){const n=DB.notes.find(x=>x.id===id);if(!n)return;editNoteId=id;populateAddr();document.getElementById('note-modal-title').textContent='עריכת הערה';document.getElementById('nm-del').style.display='';document.getElementById('nm-date').value=n.date||'';document.getElementById('nm-author').value=n.author||'';document.getElementById('nm-type').value=n.type||'כללי';document.getElementById('nm-title').value=n.title||'';document.getElementById('nm-content').value=n.content||'';document.getElementById('note-modal').classList.add('open')}
+function closeNoteModal(){document.getElementById('note-modal').classList.remove('open')}
+function saveNote(){const g=id=>document.getElementById(id).value.trim();const addr=g('nm-addr');const prop=DB.props.find(p=>p.address===addr);const rec={type:g('nm-type'),entityId:prop?.id||addr,date:g('nm-date'),author:g('nm-author'),title:g('nm-title'),content:g('nm-content')};if(editNoteId){const i=DB.notes.findIndex(x=>x.id===editNoteId);DB.notes[i]={...DB.notes[i],...rec}}else DB.notes.push({...rec,id:'NOTE-'+Date.now()});persist();closeNoteModal();renderCurrent()}
+function delNote(){if(!confirm('למחוק?'))return;DB.notes=DB.notes.filter(x=>x.id!==editNoteId);persist();closeNoteModal();renderCurrent()}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+syncAll();
+setInterval(syncAll,60000);
+</script>
+</body>
+</html>
